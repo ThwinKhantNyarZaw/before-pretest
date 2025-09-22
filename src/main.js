@@ -1,5 +1,80 @@
 const card = document.getElementById('pokemon-card');
 const btn = document.getElementById('generate-btn');
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const userInfo = document.getElementById('user-info');
+
+// Create email/password login and sign-up form
+const authSection = document.getElementById('auth-section');
+const form = document.createElement('form');
+form.id = 'auth-form';
+form.innerHTML = `
+  <input type="email" id="email" placeholder="Email" required style="margin-bottom:8px;width:100%;padding:8px;" />
+  <input type="password" id="password" placeholder="Password" required style="margin-bottom:8px;width:100%;padding:8px;" />
+  <button type="submit" id="email-login-btn">Login</button>
+  <button type="button" id="email-signup-btn" style="margin-left:8px;">Sign Up</button>
+`;
+authSection.insertBefore(form, loginBtn);
+loginBtn.style.display = 'none'; // Hide Google login
+
+const emailInput = form.querySelector('#email');
+const passwordInput = form.querySelector('#password');
+const emailLoginBtn = form.querySelector('#email-login-btn');
+const emailSignupBtn = form.querySelector('#email-signup-btn');
+
+// Firebase config (replace with your own config)
+const firebaseConfig = {
+  apiKey: "AIzaSyAoMC6SE58fC58uDB0fbtU1YyigLE5DDvU",
+  authDomain: "flashcardio-11.firebaseapp.com",
+  projectId: "flashcardio-11",
+  appId: "1:669106215792:web:b1e9240a314abc7d6bcdb5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+function updateUI(user) {
+  if (user) {
+    userInfo.textContent = `Logged in as: ${user.email}`;
+    form.style.display = 'none';
+    logoutBtn.style.display = '';
+    card.style.display = '';
+    btn.style.display = '';
+    fetchRandomPokemon();
+  } else {
+    userInfo.textContent = '';
+    form.style.display = '';
+    logoutBtn.style.display = 'none';
+    card.style.display = 'none';
+    btn.style.display = 'none';
+  }
+}
+
+auth.onAuthStateChanged(updateUI);
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (err) {
+    alert('Login failed: ' + err.message);
+  }
+});
+
+emailSignupBtn.addEventListener('click', async () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    alert('Sign up successful! You are now logged in.');
+  } catch (err) {
+    alert('Sign up failed: ' + err.message);
+  }
+});
+
+logoutBtn.onclick = () => auth.signOut();
 
 async function fetchRandomPokemon() {
   const id = Math.floor(Math.random() * 1010) + 1;
@@ -41,6 +116,7 @@ function renderPokemon(data) {
 
 btn.addEventListener('click', fetchRandomPokemon);
 window.addEventListener('DOMContentLoaded', fetchRandomPokemon);
+// Remove auto-fetch on load, only fetch after login
 
 // Animation
 const style = document.createElement('style');

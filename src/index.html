@@ -5,13 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Random Pokémon Card Generator</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
   <div class="container">
-    <div id="pokemon-card" class="card">
+    <div id="auth-section">
+      <button id="login-btn" style="display:none">Login with Google</button>
+      <button id="logout-btn" style="display:none">Logout</button>
+      <div id="user-info" style="margin-bottom:16px;"></div>
+    </div>
+    <div id="pokemon-card" class="card" style="display:none">
       <!-- Pokémon details will be injected here -->
     </div>
-    <button id="generate-btn">Generate</button>
+    <button id="generate-btn" style="display:none">Generate</button>
   </div>
   <script src="main.js"></script>
 </body>
